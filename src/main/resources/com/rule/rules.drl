@@ -1,0 +1,86 @@
+package com.rule
+
+import com.retail.repository.product.Product
+import com.retail.application.stock.StockApi.StockCheck
+
+// Blocked rule(s)
+rule "Block order for 'c'"
+    activation-group "c"
+    salience 10
+when
+    stockCheck: StockCheck( product.name == "c" )
+then
+    adviceForBlockedProduct(stockCheck);
+end
+
+// One off order rule(s)
+rule "One off order for 'd'"
+    activation-group "d"
+    salience 10
+when
+    stockCheck: StockCheck( product.name == "d" )
+then
+    adviceForProductWithOneOffOrder(stockCheck, 15);
+end
+
+// Minimum stock level rule(s)
+rule "Minimum stock level for 'a'"
+when
+    stockCheck: StockCheck( product.name == "a" )
+then
+    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+end
+
+rule "Minimum stock level for 'b'"
+when
+    stockCheck: StockCheck( product.name == "b" )
+then
+    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+end
+
+rule "Minimum stock level for 'c'"
+    activation-group "c"
+when
+    stockCheck: StockCheck( product.name == "c" )
+then
+    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+end
+
+rule "Minimum stock level for 'd'"
+    activation-group "d"
+when
+    stockCheck: StockCheck( product.name == "d" )
+then
+    adviceForProductWithMinimumStockLevel(stockCheck, 8);
+end
+
+rule "Minimum stock level for 'e'"
+when
+    stockCheck: StockCheck( product.name == "e" )
+then
+    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+end
+
+function void adviceForBlockedProduct(StockCheck stockCheck) {
+    System.out.printf("Product '%s' is 'blocked' and unable to order.%n", stockCheck.getProduct().getName());
+    stockCheck.setQuantityRequired(0);
+}
+
+function void adviceForProductWithOneOffOrder(StockCheck stockCheck, int quantityRequired) {
+    System.out.printf("Product '%s' requires order quantity of %d.%n", stockCheck.getProduct().getName(), quantityRequired);
+    stockCheck.setQuantityRequired(15);
+}
+
+function void adviceForProductWithMinimumStockLevel(StockCheck stockCheck, int minimumStockLevel) {
+    Product product = stockCheck.getProduct();
+
+    int quantity = product.getQuantity();
+    if (quantity < minimumStockLevel) {
+        int quantityRequired = (minimumStockLevel - quantity);
+        System.out.printf("Product '%s' requires order quantity of %d.%n", product.getName(), quantityRequired);
+        stockCheck.setQuantityRequired(quantityRequired);
+    } else {
+        System.out.printf("Product '%s' does not require an order.%n", product.getName());
+        stockCheck.setQuantityRequired(0);
+    }
+}
