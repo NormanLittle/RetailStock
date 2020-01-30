@@ -1,5 +1,6 @@
 package com.retail;
 
+import com.retail.stock.repository.audit.Audit;
 import com.retail.stock.repository.audit.AuditRepository;
 import com.retail.stock.repository.product.ProductRepository;
 import org.slf4j.Logger;
@@ -12,7 +13,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.annotation.PreDestroy;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import static com.retail.stock.repository.product.Product.aProduct;
@@ -52,7 +52,7 @@ public class RetailApplication implements ApplicationRunner {
         // Display audit for stock check created...
         auditRepository.findAll()
                        .stream()
-                       .map(Objects::toString)
+                       .map(Audit::toString)
                        .forEach(logger::info);
     }
 }
