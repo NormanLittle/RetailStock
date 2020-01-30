@@ -1,8 +1,8 @@
-package com.retail.repository.product;
+package com.retail.stock.repository.audit;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface AuditRepository extends JpaRepository<Audit, Long> {
 }

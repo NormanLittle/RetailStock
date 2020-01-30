@@ -1,4 +1,4 @@
-package com.retail.repository.product;
+package com.retail.stock.repository.product;
 
 import javax.persistence.*;
 

@@ -1,16 +1,18 @@
 package com.rule
 
-import com.retail.repository.product.Product
-import com.retail.application.stock.StockApi.StockCheck
+import com.retail.stock.repository.product.Product
+import com.retail.stock.application.rule.StockCheckFact
+
+global org.slf4j.Logger logger;
 
 // Blocked rule(s)
 rule "Block order for 'c'"
     activation-group "c"
     salience 10
 when
-    stockCheck: StockCheck( product.name == "c" )
+    stockCheck: StockCheckFact( product.name == "c" )
 then
-    adviceForBlockedProduct(stockCheck);
+    adviceForBlockedProduct(stockCheck, logger);
 end
 
 // One off order rule(s)
@@ -18,69 +20,69 @@ rule "One off order for 'd'"
     activation-group "d"
     salience 10
 when
-    stockCheck: StockCheck( product.name == "d" )
+    stockCheck: StockCheckFact( product.name == "d" )
 then
-    adviceForProductWithOneOffOrder(stockCheck, 15);
+    adviceForProductWithOneOffOrder(stockCheck, 15, logger);
 end
 
 // Minimum stock level rule(s)
 rule "Minimum stock level for 'a'"
 when
-    stockCheck: StockCheck( product.name == "a" )
+    stockCheck: StockCheckFact( product.name == "a" )
 then
-    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+    adviceForProductWithMinimumStockLevel(stockCheck, 4, logger);
 end
 
 rule "Minimum stock level for 'b'"
 when
-    stockCheck: StockCheck( product.name == "b" )
+    stockCheck: StockCheckFact( product.name == "b" )
 then
-    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+    adviceForProductWithMinimumStockLevel(stockCheck, 4, logger);
 end
 
 rule "Minimum stock level for 'c'"
     activation-group "c"
 when
-    stockCheck: StockCheck( product.name == "c" )
+    stockCheck: StockCheckFact( product.name == "c" )
 then
-    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+    adviceForProductWithMinimumStockLevel(stockCheck, 4, logger);
 end
 
 rule "Minimum stock level for 'd'"
     activation-group "d"
 when
-    stockCheck: StockCheck( product.name == "d" )
+    stockCheck: StockCheckFact( product.name == "d" )
 then
-    adviceForProductWithMinimumStockLevel(stockCheck, 8);
+    adviceForProductWithMinimumStockLevel(stockCheck, 8, logger);
 end
 
 rule "Minimum stock level for 'e'"
 when
-    stockCheck: StockCheck( product.name == "e" )
+    stockCheck: StockCheckFact( product.name == "e" )
 then
-    adviceForProductWithMinimumStockLevel(stockCheck, 4);
+    adviceForProductWithMinimumStockLevel(stockCheck, 4, logger);
 end
 
-function void adviceForBlockedProduct(StockCheck stockCheck) {
-    System.out.printf("Product '%s' is 'blocked' and unable to order.%n", stockCheck.getProduct().getName());
-    stockCheck.setQuantityRequired(0);
+function void adviceForBlockedProduct(StockCheckFact stockCheckFact, org.slf4j.Logger logger) {
+    logger.info("Product '" + stockCheckFact.getProduct().getName() + "' is 'blocked' and unable to order.");
+    stockCheckFact.setQuantityRequired(0);
 }
 
-function void adviceForProductWithOneOffOrder(StockCheck stockCheck, int quantityRequired) {
-    System.out.printf("Product '%s' requires order quantity of %d.%n", stockCheck.getProduct().getName(), quantityRequired);
-    stockCheck.setQuantityRequired(15);
+function void adviceForProductWithOneOffOrder(StockCheckFact stockCheckFact, int quantityRequired, org.slf4j.Logger logger) {
+    logger.info("Product '" + stockCheckFact.getProduct().getName() + "' requires order quantity of " + quantityRequired + ".");
+    stockCheckFact.setQuantityRequired(quantityRequired);
 }
 
-function void adviceForProductWithMinimumStockLevel(StockCheck stockCheck, int minimumStockLevel) {
-    Product product = stockCheck.getProduct();
+function void adviceForProductWithMinimumStockLevel(StockCheckFact stockCheckFact, int minimumStockLevel, org.slf4j.Logger logger) {
+    Product product = stockCheckFact.getProduct();
 
     int quantity = product.getQuantity();
     if (quantity < minimumStockLevel) {
         int quantityRequired = (minimumStockLevel - quantity);
-        System.out.printf("Product '%s' requires order quantity of %d.%n", product.getName(), quantityRequired);
-        stockCheck.setQuantityRequired(quantityRequired);
+        logger.info("Product '" + stockCheckFact.getProduct().getName() + "' requires order quantity of " + quantityRequired + ".");
+        stockCheckFact.setQuantityRequired(quantityRequired);
     } else {
-        System.out.printf("Product '%s' does not require an order.%n", product.getName());
-        stockCheck.setQuantityRequired(0);
+        logger.info("Product '" + stockCheckFact.getProduct().getName() + "' does not require an order.");
+        stockCheckFact.setQuantityRequired(0);
     }
 }

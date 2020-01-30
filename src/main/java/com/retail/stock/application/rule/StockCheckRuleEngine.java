@@ -1,6 +1,5 @@
-package com.retail.application.stock.rule;
+package com.retail.stock.application.rule;
 
-import com.retail.application.stock.StockApi.StockCheck;
 import org.drools.core.WorkingMemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +15,18 @@ public class StockCheckRuleEngine {
         this.workingMemory = workingMemory;
     }
 
-    public void execute(List<StockCheck> stockChecks) {
+    public void execute(List<StockCheckFact> stockCheckFacts) {
         logger.info("Executing stock check rules.");
         if (workingMemory == null) {
             logger.error("Unable to execute stock check rules.");
             return;
         }
-        executeAllRules(stockChecks);
+        executeAllRules(stockCheckFacts);
     }
 
-    private void executeAllRules(List<StockCheck> stockChecks) {
-        for (StockCheck stockCheck : stockChecks) {
-            workingMemory.insert(stockCheck);
+    private void executeAllRules(List<StockCheckFact> stockCheckFacts) {
+        for (StockCheckFact stockCheckFact : stockCheckFacts) {
+            workingMemory.insert(stockCheckFact);
         }
         workingMemory.fireAllRules();
     }

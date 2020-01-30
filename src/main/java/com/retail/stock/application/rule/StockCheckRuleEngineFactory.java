@@ -1,4 +1,4 @@
-package com.retail.application.stock.rule;
+package com.retail.stock.application.rule;
 
 import org.drools.compiler.compiler.DroolsParserException;
 import org.drools.compiler.compiler.PackageBuilder;
@@ -35,7 +35,10 @@ public class StockCheckRuleEngineFactory {
             RuleBase ruleBase = RuleBaseFactory.newRuleBase();
             ruleBase.addPackage(packageBuilder.getPackage());
 
-            return ruleBase.newStatefulSession();
+            WorkingMemory workingMemory = ruleBase.newStatefulSession();
+            workingMemory.setGlobal("logger", logger);
+
+            return workingMemory;
 
         } catch (IOException e) {
             logger.error("Failed to read rule definition file.");

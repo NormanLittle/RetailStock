@@ -1,4 +1,4 @@
-package com.retail.repository.audit;
+package com.retail.stock.repository.audit;
 
 import javax.persistence.*;
 import java.time.LocalDate;
